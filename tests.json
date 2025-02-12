@@ -1,0 +1,139 @@
+[
+  {
+    "name": "strlen",
+    "args": [
+      {
+        "name": "str",
+        "type": "const char *"
+      }
+    ],
+    "result": {
+      "type": "size_t",
+      "flag": "%ld"
+    },
+    "tests": [
+      {
+        "name": "valid_test",
+        "input": ["\"Hello World!\""],
+        "expect": "12"
+      },
+      {
+        "name": "empty_string",
+        "input": ["\"\""],
+        "expect": "0"
+      }
+    ]
+  },
+  {
+    "name": "strchr",
+    "args": [
+      {
+        "name": "str",
+        "type": "const char *"
+      },
+      {
+        "name": "c",
+        "type": "int"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "valid_test",
+        "input": ["\"Hello World!\"", "'o'"],
+        "expect": "o World!"
+      },
+      {
+        "name": "first_char",
+        "input": ["\"Hello Hubert\"", "'H'"],
+        "expect": "Hello Hubert"
+      },
+      {
+        "name": "last_char",
+        "input": ["\"Hello World!\"", "'!'"],
+        "expect": "!"
+      },
+      {
+        "name": "not_found",
+        "input": ["\"Hello World!\"", "'z'"],
+        "expect": "(null)"
+      }
+    ]
+  },
+  {
+    "name": "strrchr",
+    "args": [
+      {
+        "name": "str",
+        "type": "const char *"
+      },
+      {
+        "name": "c",
+        "type": "int"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "valid_test",
+        "input": ["\"Hello World!\"", "'o'"],
+        "expect": "orld!"
+      },
+      {
+        "name": "first_char",
+        "input": ["\"Hello Hubert\"", "'H'"],
+        "expect": "Hubert"
+      },
+      {
+        "name": "last_char",
+        "input": ["\"Hello World!\"", "'!'"],
+        "expect": "!"
+      },
+      {
+        "name": "not_found",
+        "input": ["\"Hello World!\"", "'z'"],
+        "expect": "(null)"
+      }
+    ]
+  },
+  {
+    "name": "strcmp",
+    "args": [
+      {
+        "name": "s1",
+        "type": "const char *"
+      },
+      {
+        "name": "s2",
+        "type": "const char *"
+      }
+    ],
+    "result": {
+      "type": "int",
+      "flag": "%d"
+    },
+    "tests": [
+      {
+        "name": "equal_strings",
+        "input": ["\"Hello World!\"", "\"Hello World!\""],
+        "expect": "0"
+      },
+      {
+        "name": "different_strings",
+        "input": ["\"Hello World!\"", "\"Hello Hubert\""],
+        "expect": "15"
+      },
+      {
+        "name": "different_strings",
+        "input": ["\"Hello World!\"", "\"Hello World\""],
+        "expect": "33"
+      }
+    ]
+  }
+]
