@@ -2,6 +2,7 @@ from jsonschema import validate, ValidationError
 from os import getcwd, remove
 from json import load
 import subprocess
+import argparse
 
 CWD = getcwd()
 
@@ -59,6 +60,10 @@ def execute_test(name, args, result, test):
     remove(RESULT_FILEPATH)
 
 def main():
+    parser = argparse.ArgumentParser(description="Run specific sections of the test suite.")
+    parser.add_argument('-s', '--section', nargs='+', help="Specify sections to run", required=False)
+    args = parser.parse_args()
+
     try:
         schema = load_json(SCHEMA_FILEPATH)
         tests_data = load_json(TESTS_FILEPATH)
@@ -67,10 +72,13 @@ def main():
 
         subprocess.run(["make", "re", "--silent"])
 
+        sections_to_run = args.section if args.section else [section['name'] for section in tests_data]
+
         for section in tests_data:
-            print(f"Testing '{section['name']}'")
-            for test in section["tests"]:
-                execute_test(section['name'], section['args'], section['result'], test)
+            if section['name'] in sections_to_run:
+                print(f"Testing '{section['name']}'")
+                for test in section["tests"]:
+                    execute_test(section['name'], section['args'], section['result'], test)
     except FileNotFoundError as e:
         print(f"{e.strerror}: {e.filename}")
     except KeyboardInterrupt:
