@@ -34,17 +34,11 @@ def create_function(function_name, inputs):
 
 def execute_test(name, args, result, test):
     with open(TEMPORARY_FILEPATH, 'w') as file:
-        file.write("#include <unistd.h>\n")
-        file.write("#include <stdio.h>\n")
-        file.write("#include <fcntl.h>\n")
-
         prototype = create_prototype(result['type'], name, args)
-
-        file.write(f"extern {prototype};")
-
         func = create_function(name, test['input'])
+        prerequisite = test.get('prerequisite', '')
 
-        file.write(f"int main(void) {{ int fd = open(\"{RESULT_FILEPATH}\", O_WRONLY | O_CREAT, 0644); {result['type']} res = {func}; dprintf(fd, \"{result['flag']}\", res); close(fd); return 0; }}\n")
+        file.write(f"#include <unistd.h>\n#include <stdio.h>\n#include <fcntl.h>\nextern {prototype}; int main(void) {{ {prerequisite} int fd = open(\"{RESULT_FILEPATH}\", O_WRONLY | O_CREAT, 0644); {result['type']} res = {func}; dprintf(fd, \"{result['flag']}\", res); close(fd); return 0; }}\n")
         file.close()
 
     subprocess.run(RUN_SCRIPT_FILEPATH)

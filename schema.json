@@ -30,6 +30,7 @@
           "type": "object",
           "properties": {
             "name": { "type": "string" },
+            "prequesite": { "type": "string" },
             "input": {
               "type": "array",
               "items": { "type": "string" }

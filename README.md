@@ -54,6 +54,7 @@ The tests are defined in the `tests.json` file and follow a specific schema to e
   - `flag`: The format flag used by printf to print the result.
 - `tests`: An array of test cases, each containing:
   - `name`: The name of the test case.
+  - `prerequisite`: An optional string containing the code to execute before the test. This code must not contain any function definition.
   - `input`: An array of input values for the function.
   - `expect`: The expected output of the function.
 
