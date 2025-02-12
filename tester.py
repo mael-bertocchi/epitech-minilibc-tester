@@ -1,5 +1,5 @@
 from jsonschema import validate, ValidationError
-from os import getcwd, remove
+from os import getcwd, remove, path
 from json import load
 import subprocess
 import argparse
@@ -33,25 +33,30 @@ def create_function(function_name, inputs):
     return f"{function_name}({inputs_str})"
 
 def execute_test(name, args, result, test):
-    with open(TEMPORARY_FILEPATH, 'w') as file:
-        prototype = create_prototype(result['type'], name, args)
-        func = create_function(name, test['input'])
-        prerequisite = test.get('prerequisite', '')
+    try:
+        with open(TEMPORARY_FILEPATH, 'w') as file:
+            prototype = create_prototype(result['type'], name, args)
+            func = create_function(name, test['input'])
+            prerequisite = test.get('prerequisite', '')
 
-        file.write(f"#include <unistd.h>\n#include <stdio.h>\n#include <fcntl.h>\nextern {prototype}; int main(void) {{ {prerequisite} int fd = open(\"{RESULT_FILEPATH}\", O_WRONLY | O_CREAT, 0644); {result['type']} res = {func}; dprintf(fd, \"{result['flag']}\", res); close(fd); return 0; }}\n")
-        file.close()
+            file.write(f"#include <unistd.h>\n#include <stdio.h>\n#include <fcntl.h>\nextern {prototype}; int main(void) {{ {prerequisite} int fd = open(\"{RESULT_FILEPATH}\", O_WRONLY | O_CREAT, 0644); {result['type']} res = {func}; dprintf(fd, \"{result['flag']}\", res); close(fd); return 0; }}\n")
+            file.close()
 
-    subprocess.run(RUN_SCRIPT_FILEPATH)
+        subprocess.run(RUN_SCRIPT_FILEPATH)
 
-    with open(RESULT_FILEPATH, 'r') as file:
-        res = file.read()
-        if res != test['expect']:
-            print(f"\tRunning {test['name']:<40} \033[91mKO\033[0m (Expected: '{test['expect']}', Got: '{res}')")
-        else:
-            print(f"\tRunning {test['name']:<40} \033[92mOK\033[0m")
+        with open(RESULT_FILEPATH, 'r') as file:
+            res = file.read()
+            if res != test['expect']:
+                print(f"\tRunning {test['name']:<40} \033[91mKO\033[0m (Expected: '{test['expect']}', Got: '{res}')")
+            else:
+                print(f"\tRunning {test['name']:<40} \033[92mOK\033[0m")
+    except Exception as e:
+        print(f"\tRunning {test['name']:<40} \033[91mKO\033[0m (Error: {e})")
 
-    remove(TEMPORARY_FILEPATH)
-    remove(RESULT_FILEPATH)
+    if path.exists(TEMPORARY_FILEPATH):
+        remove(TEMPORARY_FILEPATH)
+    if path.exists(RESULT_FILEPATH):
+        remove(RESULT_FILEPATH)
 
 def main():
     parser = argparse.ArgumentParser(description="Run specific sections of the test suite.")
