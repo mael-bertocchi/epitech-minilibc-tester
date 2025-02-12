@@ -6,11 +6,12 @@ import argparse
 
 CWD = getcwd()
 
-TEMPORARY_FILEPATH = f"{CWD}/tests/test.c"
-RESULT_FILEPATH = f"{CWD}/tests/res.txt"
-TESTS_FILEPATH = f"{CWD}/tests/tests.json"
-RUN_SCRIPT_FILEPATH = f"{CWD}/tests/run.sh"
-SCHEMA_FILEPATH = f"{CWD}/tests/schema.json"
+TEMPORARY_FILEPATH = f"{CWD}/tester/test.c"
+RESULT_FILEPATH = f"{CWD}/tester/res.txt"
+TESTS_FILEPATH = f"{CWD}/tester/tests/tests.json"
+SCHEMA_FILEPATH = f"{CWD}/tester/tests/schema.json"
+EXECUTER_FILEPATH = f"{CWD}/tester/script/execute.sh"
+PREPARER_FILEPATH = f"{CWD}/tester/script/prepare.sh"
 
 def validate_json(json_data, schema):
     try:
@@ -32,6 +33,12 @@ def create_function(function_name, inputs):
     inputs_str = ', '.join(inputs)
     return f"{function_name}({inputs_str})"
 
+def sanitize_workspace():
+    if path.exists(TEMPORARY_FILEPATH):
+        remove(TEMPORARY_FILEPATH)
+    if path.exists(RESULT_FILEPATH):
+        remove(RESULT_FILEPATH)
+
 def execute_test(name, args, result, test):
     try:
         with open(TEMPORARY_FILEPATH, 'w') as file:
@@ -42,7 +49,7 @@ def execute_test(name, args, result, test):
             file.write(f"#include <unistd.h>\n#include <stdio.h>\n#include <fcntl.h>\nextern {prototype}; int main(void) {{ {prerequisite} int fd = open(\"{RESULT_FILEPATH}\", O_WRONLY | O_CREAT, 0644); {result['type']} res = {func}; dprintf(fd, \"{result['flag']}\", res); close(fd); return 0; }}\n")
             file.close()
 
-        subprocess.run(RUN_SCRIPT_FILEPATH)
+        subprocess.run(EXECUTER_FILEPATH)
 
         with open(RESULT_FILEPATH, 'r') as file:
             res = file.read()
@@ -52,11 +59,6 @@ def execute_test(name, args, result, test):
                 print(f"\tRunning {test['name']:<40} \033[92mOK\033[0m")
     except Exception as e:
         print(f"\tRunning {test['name']:<40} \033[91mKO\033[0m (Error: {e})")
-
-    if path.exists(TEMPORARY_FILEPATH):
-        remove(TEMPORARY_FILEPATH)
-    if path.exists(RESULT_FILEPATH):
-        remove(RESULT_FILEPATH)
 
 def main():
     parser = argparse.ArgumentParser(description="Run specific sections of the test suite.")
@@ -68,8 +70,9 @@ def main():
         tests_data = load_json(TESTS_FILEPATH)
 
         validate_json(tests_data, schema)
+        sanitize_workspace()
 
-        subprocess.run(["make", "re", "--silent"])
+        subprocess.run(PREPARER_FILEPATH)
 
         sections_to_run = args.section if args.section else [section['name'] for section in tests_data]
 
@@ -78,6 +81,7 @@ def main():
                 print(f"Testing '{section['name']}'")
                 for test in section["tests"]:
                     execute_test(section['name'], section['args'], section['result'], test)
+                    sanitize_workspace()
     except FileNotFoundError as e:
         print(f"{e.strerror}: {e.filename}")
     except KeyboardInterrupt:

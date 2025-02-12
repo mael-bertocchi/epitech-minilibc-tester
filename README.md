@@ -13,18 +13,21 @@ Before using this tester, make sure you have the following installed on your sys
 
 ## Installation
 
-Clone this repository into a `tests` folder located at the root of your project. It is essential to follow this directory structure:
+Clone this repository into a `tester` folder located at the root of your project. It is essential to follow this directory structure:
 
 ```
 .
 ├── Makefile
 ├── src
 │    └── ...
-└── tests
-    ├── run.sh
-    ├── schema.json
-    ├── tester.py
-    └── tests.json
+└── tester
+    └── script
+    │    ├── execute.sh
+    │    └── prepare.sh
+    └── tests
+    │    ├── schema.json
+    │    ├── tests.json
+    └── tester.py
 ```
 
 > **Note**: If your project is set up correctly, your Makefile should compile the `libasm.so` library in the root of your project.
@@ -34,7 +37,7 @@ Clone this repository into a `tests` folder located at the root of your project.
 Run the tester using the following command:
 
 ```bash
-python tests/tester.py
+python3 tester/tester.py
 ```
 
 The tester will compile your project and execute the tests, displaying the results in the terminal.
