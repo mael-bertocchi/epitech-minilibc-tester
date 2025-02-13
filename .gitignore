@@ -1,12 +1,3 @@
-# Compiled Object files
-*.o
-
-# Compiled Dynamic libraries
-*.so
-
 # Test files
 *.txt
 *.c
-
-# Executable files
-test
