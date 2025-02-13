@@ -11,18 +11,18 @@ RESULT_FILEPATH = f"{CWD}/tester/res.txt"
 TESTS_FILEPATH = f"{CWD}/tester/tests/tests.json"
 SCHEMA_FILEPATH = f"{CWD}/tester/tests/schema.json"
 EXECUTER_FILEPATH = f"{CWD}/tester/script/execute.sh"
-PREPARER_FILEPATH = f"{CWD}/tester/script/prepare.sh"
+COMPILER_FILEPATH = f"{CWD}/tester/script/compile.sh"
 
-ERROR_LABEL = "\033[91mError\033[0m"
-WARNING_LABEL = "\033[93mWarning\033[0m"
-INFORMATION_LABEL = "\033[36mInformation\033[0m"
+ERROR_LABEL = "\033[91mError:\033[0m"
+WARNING_LABEL = "\033[93mWarning:\033[0m"
+INFORMATION_LABEL = "\033[36mInformation:\033[0m"
 
 def validate_json(json_data, schema):
     try:
         validate(instance=json_data, schema=schema)
-        print(f"{INFORMATION_LABEL}: The tests file is valid.")
+        print(f"{INFORMATION_LABEL} The tests file is valid.")
     except ValidationError as e:
-        print(f"{ERROR_LABEL}: The tests file contains an error: {e.message}")
+        print(f"{ERROR_LABEL} The tests file contains an error: {e.message}")
         exit(1)
 
 def load_json(filepath):
@@ -100,20 +100,21 @@ def main():
     try:
         schema = load_json(SCHEMA_FILEPATH)
         tests_data = load_json(TESTS_FILEPATH)
+        success = True
 
         validate_json(tests_data, schema)
         sanitize_workspace()
 
         if not args.no_compile:
-            subprocess.run(PREPARER_FILEPATH)
+            subprocess.run(COMPILER_FILEPATH)
         else:
-            print(f"{INFORMATION_LABEL}: Skipping the library (re)compilation.")
+            print(f"{INFORMATION_LABEL} Skipping the library (re)compilation.")
 
         if args.section:
             tests_data = [section for section in tests_data if section['name'] in args.section]
 
         if not tests_data:
-            print(f"{ERROR_LABEL}: There is no section to run.")
+            print(f"{ERROR_LABEL} There is no section to run.")
             exit(1)
 
         report = execute_tests(tests_data)
@@ -122,11 +123,15 @@ def main():
         for (section, passed, total) in report:
             percentage = int(passed / total * 100)
             print(f"\t{section:<40} {passed}/{total} ({percentage}%)")
+            if passed != total:
+                success = False
+        if not success:
+            exit(1)
 
     except FileNotFoundError as e:
-        print(f"{ERROR_LABEL}: {e.strerror}: {e.filename}")
+        print(f"{ERROR_LABEL} {e.strerror}: {e.filename}")
     except KeyboardInterrupt:
-        print(f"\n{WARNING_LABEL}: Unexpected interruption.")
+        print(f"\n{WARNING_LABEL} Unexpected interruption.")
 
 if __name__ == "__main__":
     main()
