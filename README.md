@@ -50,7 +50,7 @@ The tester will compile your project and execute the tests, displaying the resul
 
 ## How to write tests
 
-The tests are defined in the `tests.json` file and follow a specific schema to ensure consistency and correctness. You can found some examples already written in that file.
+The tests are defined in the `tests.json` file and follow a specific schema to ensure consistency and correctness. You can find some examples already written in that file.
 
 ### Test File structure
 
@@ -74,6 +74,11 @@ To add new tests, follow these steps:
 1. Open the `tests.json` file.
 2. Add a new object to the array, following the structure defined above.
 3. Define the function name, arguments, result type, and test cases.
+
+### Test validation
+
+By default, the function's return value is compared to the expected result.
+If the function modifies a pointer instead of returning a value, you can set `catch_return_value` to `false` and name the pointer `var` to indicate that validation will check for pointer modification instead.
 
 ## Author
 

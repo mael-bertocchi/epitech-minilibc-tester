@@ -99,6 +99,39 @@
         "name": "not_found",
         "input": ["\"Hello World!\"", "'z'"],
         "expect": "(null)"
+      },
+      {
+        "name": "multiple_occurrences",
+        "input": ["\"banana\"", "'a'"],
+        "expect": "a"
+      },
+      {
+        "name": "consecutive_occurrences",
+        "input": ["\"Mississippi\"", "'s'"],
+        "expect": "sippi"
+      },
+      {
+        "name": "null_terminator",
+        "input": ["\"Test\"", "'\\0'"],
+        "expect": ""
+      },
+      {
+        "name": "one_char_match",
+        "input": ["\"X\"", "'X'"],
+        "expect": "X"
+      },
+      {
+        "name": "one_char_no_match",
+        "input": ["\"X\"", "'Y'"],
+        "expect": "(null)"
+      },
+      {
+        "name": "long_string",
+        "input": [
+          "\"This is a long test string with multiple characters\"",
+          "'t'"
+        ],
+        "expect": "ters"
       }
     ]
   },
@@ -175,6 +208,85 @@
     ]
   },
   {
+    "name": "memmove",
+    "args": [
+      {
+        "name": "dest",
+        "type": "void *"
+      },
+      {
+        "name": "src",
+        "type": "const void *"
+      },
+      {
+        "name": "n",
+        "type": "size_t"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "move_string_into_empty",
+        "prerequisite": "char dest[6];",
+        "input": ["dest", "\"Hello\"", "5"],
+        "expect": "Hello"
+      },
+      {
+        "name": "move_string_into_existing",
+        "prerequisite": "char dest[6] = \"Hello\";",
+        "input": ["dest", "\"World!\"", "5"],
+        "expect": "World"
+      },
+      {
+        "name": "move_string_into_existing_with_n",
+        "prerequisite": "char dest[6] = \"Hello\";",
+        "input": ["dest", "\"World!\"", "3"],
+        "expect": "Worlo"
+      },
+      {
+        "name": "move_string_into_dest_and_src_overlap",
+        "prerequisite": "char var[10] = \"ABCDEFGHI\";",
+        "input": ["var + 2", "\"12345\"", "5"],
+        "expect": "AB12345HI",
+        "catch_return_value": false
+      },
+      {
+        "name": "move_string_with_no_overlap",
+        "prerequisite": "char var[11] = \"ABCDEFGHIJ\";",
+        "input": ["var + 2", "\"12345\"", "5"],
+        "expect": "AB12345HIJ",
+        "catch_return_value": false
+      },
+      {
+        "name": "move_zero_bytes",
+        "prerequisite": "char dest[6] = \"Hello\";",
+        "input": ["dest", "\"World!\"", "0"],
+        "expect": "Hello"
+      },
+      {
+        "name": "move_empty_string",
+        "prerequisite": "char dest[6];",
+        "input": ["dest", "\"\"", "0"],
+        "expect": ""
+      },
+      {
+        "name": "move_with_large_n",
+        "prerequisite": "char dest[20] = \"ABCDEFGHIJ\";",
+        "input": ["dest", "\"1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ\"", "20"],
+        "expect": "1234567890ABCDEFGHIJ"
+      },
+      {
+        "name": "move_with_same_src_and_dest",
+        "prerequisite": "char dest[6] = \"Hello\";",
+        "input": ["dest", "dest", "5"],
+        "expect": "Hello"
+      }
+    ]
+  },
+  {
     "name": "memset",
     "args": [
       {
@@ -247,6 +359,117 @@
         "prerequisite": "char dest[5] = \"Hello\";",
         "input": ["dest", "\"World!\"", "3"],
         "expect": "Worlo"
+      }
+    ]
+  },
+  {
+    "name": "strcasecmp",
+    "args": [
+      {
+        "name": "s1",
+        "type": "const char *"
+      },
+      {
+        "name": "s2",
+        "type": "const char *"
+      }
+    ],
+    "result": {
+      "type": "int",
+      "flag": "%d"
+    },
+    "tests": [
+      {
+        "name": "equal_strings",
+        "input": ["\"Hello World!\"", "\"Hello World!\""],
+        "expect": "0"
+      },
+      {
+        "name": "different_strings",
+        "input": ["\"Hello World!\"", "\"Hello Hubert\""],
+        "expect": "15"
+      },
+      {
+        "name": "different_strings",
+        "input": ["\"Hello World!\"", "\"Hello World\""],
+        "expect": "33"
+      },
+      {
+        "name": "different_strings_case_insensitive",
+        "input": ["\"Hello World!\"", "\"hello world!\""],
+        "expect": "0"
+      }
+    ]
+  },
+  {
+    "name": "strstr",
+    "args": [
+      {
+        "name": "haystack",
+        "type": "const char *"
+      },
+      {
+        "name": "needle",
+        "type": "const char *"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "valid_test",
+        "input": ["\"Hello World!\"", "\"World\""],
+        "expect": "World!"
+      },
+      {
+        "name": "first_char",
+        "input": ["\"Hello Hubert\"", "\"H\""],
+        "expect": "Hello Hubert"
+      },
+      {
+        "name": "last_char",
+        "input": ["\"Hello World!\"", "\"!\""],
+        "expect": "!"
+      },
+      {
+        "name": "not_found",
+        "input": ["\"Hello World!\"", "\"z\""],
+        "expect": "(null)"
+      },
+      {
+        "name": "multiple_occurrences",
+        "input": ["\"banana\"", "\"a\""],
+        "expect": "anana"
+      },
+      {
+        "name": "consecutive_occurrences",
+        "input": ["\"Mississippi\"", "\"ss\""],
+        "expect": "ssissippi"
+      },
+      {
+        "name": "null_terminator",
+        "input": ["\"Test\"", "\"\\0\""],
+        "expect": "Test"
+      },
+      {
+        "name": "one_char_match",
+        "input": ["\"X\"", "\"X\""],
+        "expect": "X"
+      },
+      {
+        "name": "one_char_no_match",
+        "input": ["\"X\"", "\"Y\""],
+        "expect": "(null)"
+      },
+      {
+        "name": "long_string",
+        "input": [
+          "\"This is a long test string with multiple characters\"",
+          "\"ters\""
+        ],
+        "expect": "ters"
       }
     ]
   }

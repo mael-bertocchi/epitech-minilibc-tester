@@ -25,13 +25,13 @@ def load_json(filepath):
     with open(filepath, 'r') as file:
         return load(file)
 
-def create_prototype(return_type, function_name, args):
+def create_prototype(return_type, name, args):
     args_str = ', '.join(f"{arg['type']} {arg['name']}" for arg in args)
-    return f"{return_type} {function_name}({args_str})"
+    return f"{return_type} {name}({args_str})"
 
-def create_function(function_name, inputs):
+def create_function_call(name, inputs):
     inputs_str = ', '.join(inputs)
-    return f"{function_name}({inputs_str})"
+    return f"{name}({inputs_str})"
 
 def sanitize_workspace():
     if path.exists(TEMPORARY_FILEPATH):
@@ -42,11 +42,20 @@ def sanitize_workspace():
 def execute_test(name, args, result, test):
     try:
         with open(TEMPORARY_FILEPATH, 'w') as file:
+            function_call = create_function_call(name, test['input'])
             prototype = create_prototype(result['type'], name, args)
-            func = create_function(name, test['input'])
+
+            catch_return_value = test.get('catch_return_value', True)
             prerequisite = test.get('prerequisite', '')
 
-            file.write(f"#include <unistd.h>\n#include <stdio.h>\n#include <fcntl.h>\nextern {prototype}; int main(void) {{ {prerequisite} int fd = open(\"{RESULT_FILEPATH}\", O_WRONLY | O_CREAT, 0644); {result['type']} res = {func}; dprintf(fd, \"{result['flag']}\", res); close(fd); return 0; }}\n")
+            begin_code = f"#include <unistd.h>\n#include <stdio.h>\n#include <fcntl.h>\nextern {prototype}; int main(void) {{ {prerequisite}; int fd = open(\"{RESULT_FILEPATH}\", O_WRONLY | O_CREAT, 0644);"
+            if catch_return_value:
+                specific_code = f"{result['type']} res = {function_call}; dprintf(fd, \"{result['flag']}\", res);"
+            else:
+                specific_code = f"{function_call}; dprintf(fd, \"{result['flag']}\", var);"
+            end_code = "close(fd); return 0;}\n"
+
+            file.write(begin_code + specific_code + end_code)
             file.close()
 
         subprocess.run(EXECUTER_FILEPATH)
