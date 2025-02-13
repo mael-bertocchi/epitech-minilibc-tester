@@ -48,6 +48,14 @@ python3 tester/tester.py
 
 The tester will compile your project and execute the tests, displaying the results in the terminal.
 
+## Options
+
+The tester script accepts the following options:
+
+- `-h` or `--help`: Display the help message.
+- `-s` or `--skip-compile`: Skip the library compilation step.
+- `-t` or `--test`: Specify a list of function to test. The tester will only run the tests for the specified functions.
+
 ## How to write tests
 
 The tests are defined in the `tests.json` file and follow a specific schema to ensure consistency and correctness. You can find some examples already written in that file.

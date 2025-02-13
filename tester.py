@@ -91,42 +91,45 @@ def execute_tests(tests_data):
         report.append((section['name'], passed, total))
     return report
 
+def create_report(report):
+    success = True
+
+    print("- Report:")
+    for (section, passed, total) in report:
+        percentage = int(passed / total * 100)
+        print(f"\t{section:<40} {passed}/{total} ({percentage}%)")
+        if passed != total:
+            success = False
+    if not success:
+        exit(1)
+
 def main():
-    parser = argparse.ArgumentParser(description="Run specific sections of the test suite.")
-    parser.add_argument('-s', '--section', nargs='+', help="Specify sections to run", required=False)
-    parser.add_argument('--no-compile', action='store_true', help="Skip the preparation step", required=False)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--test', nargs='+', help="Specify a list of function to test", required=False)
+    parser.add_argument('-s', '--skip-compile', action='store_true', help="Skip the library compilation step", required=False)
     args = parser.parse_args()
 
     try:
         schema = load_json(SCHEMA_FILEPATH)
         tests_data = load_json(TESTS_FILEPATH)
-        success = True
 
         validate_json(tests_data, schema)
         sanitize_workspace()
 
-        if not args.no_compile:
+        if not args.skip_compile:
             subprocess.run(COMPILER_FILEPATH)
         else:
-            print(f"{INFORMATION_LABEL} Skipping the library (re)compilation.")
+            print(f"{INFORMATION_LABEL} Skipping library compilation.")
 
-        if args.section:
-            tests_data = [section for section in tests_data if section['name'] in args.section]
+        if args.test:
+            tests_data = [test for test in tests_data if test['name'] in args.test]
 
         if not tests_data:
             print(f"{ERROR_LABEL} There is no section to run.")
             exit(1)
 
         report = execute_tests(tests_data)
-
-        print("- Report:")
-        for (section, passed, total) in report:
-            percentage = int(passed / total * 100)
-            print(f"\t{section:<40} {passed}/{total} ({percentage}%)")
-            if passed != total:
-                success = False
-        if not success:
-            exit(1)
+        create_report(report)
 
     except FileNotFoundError as e:
         print(f"{ERROR_LABEL} {e.strerror}: {e.filename}")
