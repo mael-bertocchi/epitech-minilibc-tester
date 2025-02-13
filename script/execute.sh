@@ -1,16 +1,9 @@
 #!/bin/bash
 
 # Compile the library
-gcc -L. -lasm -fno-builtin -o test tester/test.c
+gcc -o test tester/test.c -Wall -Wextra -fno-builtin
 
-# Export the library path
-export LD_LIBRARY_PATH=.
-
-# Export the library preload
-export LD_PRELOAD=libasm.so
-
-# Execute the test
-./test
+LD_PRELOAD=./libasm.so ./test
 
 # Remove the executable
 rm -f test

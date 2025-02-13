@@ -32,6 +32,12 @@ Clone this repository into a `tester` folder located at the root of your project
 
 > **Note**: If your project is set up correctly, your Makefile should compile the `libasm.so` library in the root of your project.
 
+You may also need to install the `jsonschema` package for Python. You can achieve this by running the following command:
+
+```bash
+pip3 install jsonschema
+```
+
 ## Usage
 
 Run the tester using the following command:
@@ -44,7 +50,7 @@ The tester will compile your project and execute the tests, displaying the resul
 
 ## How to write tests
 
-The tests are defined in the `tests.json` file and follow a specific schema to ensure consistency and correctness.
+The tests are defined in the `tests.json` file and follow a specific schema to ensure consistency and correctness. You can found some examples already written in that file.
 
 ### Test File structure
 

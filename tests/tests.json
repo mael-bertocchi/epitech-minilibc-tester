@@ -135,5 +135,119 @@
         "expect": "33"
       }
     ]
+  },
+  {
+    "name": "strncmp",
+    "args": [
+      {
+        "name": "s1",
+        "type": "const char *"
+      },
+      {
+        "name": "s2",
+        "type": "const char *"
+      },
+      {
+        "name": "n",
+        "type": "size_t"
+      }
+    ],
+    "result": {
+      "type": "int",
+      "flag": "%d"
+    },
+    "tests": [
+      {
+        "name": "equal_strings",
+        "input": ["\"Hello World!\"", "\"Hello World!\"", "12"],
+        "expect": "0"
+      },
+      {
+        "name": "different_strings_with_n",
+        "input": ["\"Hello World!\"", "\"Hello Hubert\"", "5"],
+        "expect": "0"
+      },
+      {
+        "name": "different_strings",
+        "input": ["\"Hello World!\"", "\"Hello World\"", "12"],
+        "expect": "33"
+      }
+    ]
+  },
+  {
+    "name": "memset",
+    "args": [
+      {
+        "name": "s",
+        "type": "void *"
+      },
+      {
+        "name": "c",
+        "type": "int"
+      },
+      {
+        "name": "n",
+        "type": "size_t"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "fill_string_with_char",
+        "prerequisite": "char str[5];",
+        "input": ["str", "42", "5"],
+        "expect": "*****"
+      },
+      {
+        "name": "reset_string",
+        "prerequisite": "char str[5] = \"Hello\";",
+        "input": ["str", "0", "5"],
+        "expect": ""
+      }
+    ]
+  },
+  {
+    "name": "memcpy",
+    "args": [
+      {
+        "name": "dest",
+        "type": "void *"
+      },
+      {
+        "name": "src",
+        "type": "const void *"
+      },
+      {
+        "name": "n",
+        "type": "size_t"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "copy_string_into_empty",
+        "prerequisite": "char dest[5];",
+        "input": ["dest", "\"Hello\"", "5"],
+        "expect": "Hello"
+      },
+      {
+        "name": "copy_string_into_existing",
+        "prerequisite": "char dest[5] = \"Hello\";",
+        "input": ["dest", "\"World!\"", "5"],
+        "expect": "World"
+      },
+      {
+        "name": "copy_string_into_existing_with_n",
+        "prerequisite": "char dest[5] = \"Hello\";",
+        "input": ["dest", "\"World!\"", "3"],
+        "expect": "Worlo"
+      }
+    ]
   }
 ]
