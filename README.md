@@ -2,6 +2,19 @@
 
 This script is a simple tester for the MiniLibC project at Epitech.
 
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Options](#options)
+- [How to write tests](#how-to-write-tests)
+  - [Test File structure](#test-file-structure)
+  - [Adding New Tests](#adding-new-tests)
+  - [Test validation](#test-validation)
+- [Continuous Integration Example](#continuous-integration-example)
+- [Author](#author)
+
 ## Requirements
 
 Before using this tester, make sure you have the following installed on your system:
@@ -87,6 +100,49 @@ To add new tests, follow these steps:
 
 By default, the function's return value is compared to the expected result.
 If the function modifies a pointer instead of returning a value, you can set `catch_return_value` to `false` and name the pointer `var` to indicate that validation will check for pointer modification instead.
+
+## Continuous Integration Example
+
+You can use GitHub Actions to run the tester automatically on each push. Here is an example of a workflow file:
+
+```yml
+name: Build and test
+
+env:
+  TESTER_URL: "https://github.com/mael-bertocchi/epitech-minilibc-tester.git"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clone tester repository
+        run: git clone $TESTER_URL tester
+
+      - name: Build
+        run: make
+        timeout-minutes: 2
+
+      - name: Test
+        run: python3 tester/tester.py --skip-compile
+        timeout-minutes: 5
+
+      - name: Cleanup
+        run: make fclean
+```
 
 ## Author
 
