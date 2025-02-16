@@ -229,60 +229,64 @@
     },
     "tests": [
       {
-        "name": "move_string_into_empty",
-        "prerequisite": "char dest[6];",
-        "input": ["dest", "\"Hello\"", "5"],
-        "expect": "Hello"
-      },
-      {
-        "name": "move_string_into_existing",
-        "prerequisite": "char dest[6] = \"Hello\";",
-        "input": ["dest", "\"World!\"", "5"],
-        "expect": "World"
-      },
-      {
-        "name": "move_string_into_existing_with_n",
-        "prerequisite": "char dest[6] = \"Hello\";",
-        "input": ["dest", "\"World!\"", "3"],
-        "expect": "Worlo"
-      },
-      {
-        "name": "move_string_into_dest_and_src_overlap",
+        "name": "move_with_partial_overlap_forward",
         "prerequisite": "char var[10] = \"ABCDEFGHI\";",
-        "input": ["var + 2", "\"12345\"", "5"],
-        "expect": "AB12345HI",
-        "catch_return_value": false
+        "input": ["var + 3", "var", "5"],
+        "expect": "ABCDEI"
       },
       {
-        "name": "move_string_with_no_overlap",
-        "prerequisite": "char var[11] = \"ABCDEFGHIJ\";",
-        "input": ["var + 2", "\"12345\"", "5"],
-        "expect": "AB12345HIJ",
-        "catch_return_value": false
+        "name": "move_with_partial_overlap_backward",
+        "prerequisite": "char var[10] = \"ABCDEFGHI\";",
+        "input": ["var", "var + 3", "5"],
+        "expect": "DEFGHFGHI"
       },
       {
-        "name": "move_zero_bytes",
-        "prerequisite": "char dest[6] = \"Hello\";",
-        "input": ["dest", "\"World!\"", "0"],
+        "name": "move_entire_string_with_overlap",
+        "prerequisite": "char var[10] = \"ABCDEFGHI\";",
+        "input": ["var + 1", "var", "9"],
+        "expect": "ABCDEFGHI"
+      },
+      {
+        "name": "move_same_memory",
+        "prerequisite": "char var[6] = \"Hello\";",
+        "input": ["var", "var", "5"],
         "expect": "Hello"
       },
       {
-        "name": "move_empty_string",
-        "prerequisite": "char dest[6];",
-        "input": ["dest", "\"\"", "0"],
-        "expect": ""
-      },
-      {
-        "name": "move_with_large_n",
-        "prerequisite": "char dest[20] = \"ABCDEFGHIJ\";",
-        "input": ["dest", "\"1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ\"", "20"],
-        "expect": "1234567890ABCDEFGHIJ"
-      },
-      {
-        "name": "move_with_same_src_and_dest",
+        "name": "move_single_character",
         "prerequisite": "char dest[6] = \"Hello\";",
-        "input": ["dest", "dest", "5"],
-        "expect": "Hello"
+        "input": ["dest + 2", "dest", "1"],
+        "expect": "Hlo"
+      },
+      {
+        "name": "move_large_block_of_data",
+        "prerequisite": "char var[30] = \"1234567890abcdefghijklmnopqrst\";",
+        "input": ["var + 5", "var", "25"],
+        "expect": "1234567890abcdefghijklmno"
+      },
+      {
+        "name": "move_entire_block_with_overlap",
+        "prerequisite": "char var[20] = \"1234567890abcdefghij\";",
+        "input": ["var + 3", "var", "17"],
+        "expect": "1234567890abcdefg"
+      },
+      {
+        "name": "move_substring_to_start",
+        "prerequisite": "char var[20] = \"Hello, World!\";",
+        "input": ["var", "var + 7", "6"],
+        "expect": "World! World!"
+      },
+      {
+        "name": "move_with_null_character",
+        "prerequisite": "char var[10] = \"ABC\\0DEFGH\";",
+        "input": ["var + 2", "var", "5"],
+        "expect": "ABC"
+      },
+      {
+        "name": "move_large_n_beyond_buffer",
+        "prerequisite": "char dest[10] = \"123456789\";",
+        "input": ["dest", "\"ABCDEFGHIJKLM\"", "10"],
+        "expect": "ABCDEFGHIJ"
       }
     ]
   },
@@ -470,6 +474,139 @@
           "\"ters\""
         ],
         "expect": "ters"
+      },
+      {
+        "name": "empty_haystack",
+        "input": ["\"\"", "\"abc\""],
+        "expect": "(null)"
+      },
+      {
+        "name": "empty_needle",
+        "input": ["\"Hello World!\"", "\"\""],
+        "expect": "Hello World!"
+      },
+      {
+        "name": "needle_is_haystack",
+        "input": ["\"CompleteMatch\"", "\"CompleteMatch\""],
+        "expect": "CompleteMatch"
+      },
+      {
+        "name": "case_sensitivity",
+        "input": ["\"Hello World!\"", "\"world\""],
+        "expect": "(null)"
+      },
+      {
+        "name": "special_characters",
+        "input": ["\"Hello, how are you?\"", "\"how\""],
+        "expect": "how are you?"
+      },
+      {
+        "name": "space_in_haystack",
+        "input": ["\"   leading spaces\"", "\"leading\""],
+        "expect": "leading spaces"
+      }
+    ]
+  },
+  {
+    "name": "strpbrk",
+    "args": [
+      {
+        "name": "str",
+        "type": "const char *"
+      },
+      {
+        "name": "charset",
+        "type": "const char *"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "single_match",
+        "input": ["\"Hello World!\"", "\"oW\""],
+        "expect": "o World!"
+      },
+      {
+        "name": "first_char_match",
+        "input": ["\"Hello World!\"", "\"H\""],
+        "expect": "Hello World!"
+      },
+      {
+        "name": "last_char_match",
+        "input": ["\"Hello World!\"", "\"!d\""],
+        "expect": "d!"
+      },
+      {
+        "name": "no_match",
+        "input": ["\"Hello World!\"", "\"xyz\""],
+        "expect": "(null)"
+      },
+      {
+        "name": "empty_charset",
+        "input": ["\"Hello World!\"", "\"\""],
+        "expect": "(null)"
+      },
+      {
+        "name": "empty_string",
+        "input": ["\"\"", "\"abc\""],
+        "expect": "(null)"
+      }
+    ]
+  },
+  {
+    "name": "strcspn",
+    "args": [
+      {
+        "name": "str",
+        "type": "const char *"
+      },
+      {
+        "name": "charset",
+        "type": "const char *"
+      }
+    ],
+    "result": {
+      "type": "size_t",
+      "flag": "%ld"
+    },
+    "tests": [
+      {
+        "name": "single_match",
+        "input": ["\"Hello World!\"", "\"oW\""],
+        "expect": "4"
+      },
+      {
+        "name": "first_char_match",
+        "input": ["\"Hello World!\"", "\"H\""],
+        "expect": "0"
+      },
+      {
+        "name": "last_char_match",
+        "input": ["\"Hello World!\"", "\"!d\""],
+        "expect": "10"
+      },
+      {
+        "name": "no_match",
+        "input": ["\"Hello World!\"", "\"xyz\""],
+        "expect": "12"
+      },
+      {
+        "name": "multiple_occurrences",
+        "input": ["\"banana\"", "\"an\""],
+        "expect": "1"
+      },
+      {
+        "name": "empty_charset",
+        "input": ["\"Hello World!\"", "\"\""],
+        "expect": "12"
+      },
+      {
+        "name": "empty_string",
+        "input": ["\"\"", "\"abc\""],
+        "expect": "0"
       }
     ]
   }

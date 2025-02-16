@@ -1,6 +1,6 @@
 from jsonschema import validate, ValidationError
 from os import getcwd, remove, path
-from json import load
+from json import load, JSONDecodeError
 import subprocess
 import argparse
 
@@ -17,7 +17,7 @@ ERROR_LABEL = "\033[91mError:\033[0m"
 WARNING_LABEL = "\033[93mWarning:\033[0m"
 INFORMATION_LABEL = "\033[36mInformation:\033[0m"
 
-def validate_json(json_data, schema):
+def validate_JSON(json_data, schema):
     try:
         validate(instance=json_data, schema=schema)
         print(f"{INFORMATION_LABEL} The tests file is valid.")
@@ -25,9 +25,13 @@ def validate_json(json_data, schema):
         print(f"{ERROR_LABEL} The tests file contains an error: {e.message}")
         exit(1)
 
-def load_json(filepath):
-    with open(filepath, 'r') as file:
-        return load(file)
+def open_JSON(filepath):
+    try:
+        with open(filepath, 'r') as file:
+            return load(file)
+    except JSONDecodeError as e:
+        print(f"{ERROR_LABEL} The file is not a valid JSON file: {e}")
+        exit(1)
 
 def create_prototype(return_type, name, args):
     args_str = ', '.join(f"{arg['type']} {arg['name']}" for arg in args)
@@ -110,10 +114,10 @@ def main():
     args = parser.parse_args()
 
     try:
-        schema = load_json(SCHEMA_FILEPATH)
-        tests_data = load_json(TESTS_FILEPATH)
+        schema = open_JSON(SCHEMA_FILEPATH)
+        tests_data = open_JSON(TESTS_FILEPATH)
 
-        validate_json(tests_data, schema)
+        validate_JSON(tests_data, schema)
         sanitize_workspace()
 
         if not args.skip_compile:
@@ -130,7 +134,6 @@ def main():
 
         report = execute_tests(tests_data)
         create_report(report)
-
     except FileNotFoundError as e:
         print(f"{ERROR_LABEL} {e.strerror}: {e.filename}")
     except KeyboardInterrupt:
