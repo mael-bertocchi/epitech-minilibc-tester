@@ -22,7 +22,7 @@ def validate_JSON(json_data, schema):
         validate(instance=json_data, schema=schema)
         print(f"{INFORMATION_LABEL} The tests file is valid.")
     except ValidationError as e:
-        print(f"{ERROR_LABEL} The tests file contains an error: {e.message}")
+        print(f"{ERROR_LABEL} '{TESTS_FILEPATH}' contains an error: {e.message}")
         exit(1)
 
 def open_JSON(filepath):
@@ -30,7 +30,7 @@ def open_JSON(filepath):
         with open(filepath, 'r') as file:
             return load(file)
     except JSONDecodeError as e:
-        print(f"{ERROR_LABEL} The file is not a valid JSON file: {e}")
+        print(f"{ERROR_LABEL} '{filepath}' is not a valid JSON file: {e}")
         exit(1)
 
 def create_prototype(return_type, name, args):
