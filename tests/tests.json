@@ -64,7 +64,118 @@
     ]
   },
   {
+    "name": "index",
+    "args": [
+      {
+        "name": "str",
+        "type": "const char *"
+      },
+      {
+        "name": "c",
+        "type": "int"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "valid_test",
+        "input": ["\"Hello World!\"", "'o'"],
+        "expect": "o World!"
+      },
+      {
+        "name": "first_char",
+        "input": ["\"Hello Hubert\"", "'H'"],
+        "expect": "Hello Hubert"
+      },
+      {
+        "name": "last_char",
+        "input": ["\"Hello World!\"", "'!'"],
+        "expect": "!"
+      },
+      {
+        "name": "not_found",
+        "input": ["\"Hello World!\"", "'z'"],
+        "expect": "(null)"
+      }
+    ]
+  },
+  {
     "name": "strrchr",
+    "args": [
+      {
+        "name": "str",
+        "type": "const char *"
+      },
+      {
+        "name": "c",
+        "type": "int"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "valid_test",
+        "input": ["\"Hello World!\"", "'o'"],
+        "expect": "orld!"
+      },
+      {
+        "name": "first_char",
+        "input": ["\"Hello Hubert\"", "'H'"],
+        "expect": "Hubert"
+      },
+      {
+        "name": "last_char",
+        "input": ["\"Hello World!\"", "'!'"],
+        "expect": "!"
+      },
+      {
+        "name": "not_found",
+        "input": ["\"Hello World!\"", "'z'"],
+        "expect": "(null)"
+      },
+      {
+        "name": "multiple_occurrences",
+        "input": ["\"banana\"", "'a'"],
+        "expect": "a"
+      },
+      {
+        "name": "consecutive_occurrences",
+        "input": ["\"Mississippi\"", "'s'"],
+        "expect": "sippi"
+      },
+      {
+        "name": "null_terminator",
+        "input": ["\"Test\"", "'\\0'"],
+        "expect": ""
+      },
+      {
+        "name": "one_char_match",
+        "input": ["\"X\"", "'X'"],
+        "expect": "X"
+      },
+      {
+        "name": "one_char_no_match",
+        "input": ["\"X\"", "'Y'"],
+        "expect": "(null)"
+      },
+      {
+        "name": "long_string",
+        "input": [
+          "\"This is a long test string with multiple characters\"",
+          "'t'"
+        ],
+        "expect": "ters"
+      }
+    ]
+  },
+  {
+    "name": "rindex",
     "args": [
       {
         "name": "str",
@@ -384,23 +495,83 @@
     },
     "tests": [
       {
-        "name": "equal_strings",
-        "input": ["\"Hello World!\"", "\"Hello World!\""],
+        "name": "equal_strings_case_insensitive",
+        "input": ["\"Hello World!\"", "\"hello world!\""],
         "expect": "0"
       },
       {
-        "name": "different_strings",
-        "input": ["\"Hello World!\"", "\"Hello Hubert\""],
-        "expect": "15"
-      },
-      {
-        "name": "different_strings",
-        "input": ["\"Hello World!\"", "\"Hello World\""],
-        "expect": "33"
-      },
-      {
         "name": "different_strings_case_insensitive",
+        "input": ["\"Apple\"", "\"banana\""],
+        "expect": "-1"
+      },
+      {
+        "name": "equal_strings_same_case",
+        "input": ["\"HELLO\"", "\"HELLO\""],
+        "expect": "0"
+      },
+      {
+        "name": "different_strings_different_case",
+        "input": ["\"apple\"", "\"APPLE\""],
+        "expect": "0"
+      },
+      {
+        "name": "case_sensitive_differently_cased_strings",
+        "input": ["\"CaseSensitive\"", "\"casesensitive\""],
+        "expect": "0"
+      },
+      {
+        "name": "prefix_match_case_insensitive",
+        "input": ["\"prefixTest\"", "\"prefix\""],
+        "expect": "116"
+      },
+      {
+        "name": "suffix_match_case_insensitive",
+        "input": ["\"testSuffix\"", "\"suffix\""],
+        "expect": "1"
+      },
+      {
+        "name": "different_lengths_case_sensitive",
+        "input": ["\"abc\"", "\"abcd\""],
+        "expect": "-100"
+      },
+      {
+        "name": "empty_string_with_non_empty_string",
+        "input": ["\"\"", "\"NonEmpty\""],
+        "expect": "-110"
+      },
+      {
+        "name": "non_empty_string_with_empty_string",
+        "input": ["\"NonEmpty\"", "\"\""],
+        "expect": "110"
+      },
+      {
+        "name": "empty_strings_case_insensitive",
+        "input": ["\"\"", "\"\""],
+        "expect": "0"
+      },
+      {
+        "name": "strings_with_special_characters",
+        "input": ["\"Hello!@#$\"", "\"hello!@#$\""],
+        "expect": "0"
+      },
+      {
+        "name": "strings_with_numbers_case_insensitive",
+        "input": ["\"Test123\"", "\"test123\""],
+        "expect": "0"
+      },
+      {
+        "name": "strings_with_mixed_case",
+        "input": ["\"MiXeD@123!\"", "\"mixed@123!\""],
+        "expect": "0"
+      },
+      {
+        "name": "strings_with_spaces_case_insensitive",
         "input": ["\"Hello World!\"", "\"hello world!\""],
+        "expect": "0"
+      },
+      {
+        "name": "long_strings_case_insensitive",
+        "input": ["\"LongStringTestExample\"", "\"longstringtestexample\""],
         "expect": "0"
       }
     ]
@@ -504,6 +675,11 @@
         "name": "space_in_haystack",
         "input": ["\"   leading spaces\"", "\"leading\""],
         "expect": "leading spaces"
+      },
+      {
+        "name": "two_empty_string",
+        "input": ["\"\"", "\"\""],
+        "expect": ""
       }
     ]
   },
@@ -607,6 +783,31 @@
         "name": "empty_string",
         "input": ["\"\"", "\"abc\""],
         "expect": "0"
+      }
+    ]
+  },
+  {
+    "name": "memfrob",
+    "args": [
+      {
+        "name": "s",
+        "type": "void *"
+      },
+      {
+        "name": "n",
+        "type": "size_t"
+      }
+    ],
+    "result": {
+      "type": "char *",
+      "flag": "%s"
+    },
+    "tests": [
+      {
+        "name": "valid_test",
+        "prerequisite": "char str[5] = \"Hello\";",
+        "input": ["str", "5"],
+        "expect": "bOFFE"
       }
     ]
   }
