@@ -808,6 +808,12 @@
         "prerequisite": "char str[5] = \"Hello\";",
         "input": ["str", "5"],
         "expect": "bOFFE"
+      },
+      {
+        "name": "size_zero",
+        "prerequisite": "char str[5] = \"Hello\";",
+        "input": ["str", "0"],
+        "expect": "Hello"
       }
     ]
   }
