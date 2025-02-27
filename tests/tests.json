@@ -816,5 +816,95 @@
         "expect": "Hello"
       }
     ]
+  },
+  {
+    "name": "ffs",
+    "args": [
+      {
+        "name": "i",
+        "type": "int"
+      }
+    ],
+    "result": {
+      "type": "int",
+      "flag": "%d"
+    },
+    "tests": [
+      {
+        "name": "zero",
+        "input": ["0"],
+        "expect": "0"
+      },
+      {
+        "name": "one",
+        "input": ["1"],
+        "expect": "1"
+      },
+      {
+        "name": "negative_one",
+        "input": ["-1"],
+        "expect": "1"
+      },
+      {
+        "name": "negative_two",
+        "input": ["-2"],
+        "expect": "2"
+      },
+      {
+        "name": "negative_four",
+        "input": ["-4"],
+        "expect": "3"
+      },
+      {
+        "name": "negative_eight",
+        "input": ["-8"],
+        "expect": "4"
+      },
+      {
+        "name": "negative_sixteen",
+        "input": ["-16"],
+        "expect": "5"
+      },
+      {
+        "name": "negative_thirty_two",
+        "input": ["-32"],
+        "expect": "6"
+      },
+      {
+        "name": "negative_sixty_four",
+        "input": ["-64"],
+        "expect": "7"
+      },
+      {
+        "name": "negative_one_hundred_twenty_eight",
+        "input": ["-128"],
+        "expect": "8"
+      },
+      {
+        "name": "negative_two_hundred_fifty_six",
+        "input": ["-256"],
+        "expect": "9"
+      },
+      {
+        "name": "negative_five_hundred_twelve",
+        "input": ["-512"],
+        "expect": "10"
+      },
+      {
+        "name": "negative_one_thousand_twenty_four",
+        "input": ["-1024"],
+        "expect": "11"
+      },
+      {
+        "name": "negative_two_thousand_forty_eight",
+        "input": ["-2048"],
+        "expect": "12"
+      },
+      {
+        "name": "negative_four_thousand_ninety_six",
+        "input": ["-4096"],
+        "expect": "13"
+      }
+    ]
   }
 ]
